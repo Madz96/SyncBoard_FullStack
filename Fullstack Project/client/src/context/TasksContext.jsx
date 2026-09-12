@@ -58,11 +58,24 @@ export function TasksProvider({ children }) {
     dispatch({ type: 'LOAD_START' });
     try {
       const [boards, members] = await Promise.all([api.getBoards(user.id), api.getMembers()]);
+      localStorage.setItem('syncboard_cached_boards', JSON.stringify({ boards, members }));
       dispatch({ 
         type: 'BOARDS_LOADED', 
         payload: { boards, members, activeBoardId: boards.length > 0 ? boards[0].id : null } 
       });
     } catch (err) {
+      try {
+        const cached = JSON.parse(localStorage.getItem('syncboard_cached_boards') || 'null');
+        if (cached && Array.isArray(cached.boards) && Array.isArray(cached.members)) {
+          dispatch({
+            type: 'BOARDS_LOADED',
+            payload: { boards: cached.boards, members: cached.members, activeBoardId: cached.boards.length > 0 ? cached.boards[0].id : null }
+          });
+          return;
+        }
+      } catch {
+        localStorage.removeItem('syncboard_cached_boards');
+      }
       dispatch({ type: 'LOAD_ERROR', error: err.message });
     }
   }, [user]);
@@ -73,8 +86,18 @@ export function TasksProvider({ children }) {
     dispatch({ type: 'LOAD_START' });
     try {
       const [tasks, columns] = await Promise.all([api.getTasks(boardId), api.getColumns(boardId)]);
+      localStorage.setItem(`syncboard_cached_board_${boardId}`, JSON.stringify({ tasks, columns }));
       dispatch({ type: 'BOARD_DATA_LOADED', payload: { tasks, columns } });
     } catch (err) {
+      try {
+        const cached = JSON.parse(localStorage.getItem(`syncboard_cached_board_${boardId}`) || 'null');
+        if (cached && Array.isArray(cached.tasks) && Array.isArray(cached.columns)) {
+          dispatch({ type: 'BOARD_DATA_LOADED', payload: { tasks: cached.tasks, columns: cached.columns } });
+          return;
+        }
+      } catch {
+        localStorage.removeItem(`syncboard_cached_board_${boardId}`);
+      }
       dispatch({ type: 'LOAD_ERROR', error: err.message });
     }
   }, []);
