@@ -13,7 +13,9 @@ import connectDB from './config/db.js';
 dotenv.config();
 
 // Connect to MongoDB
-connectDB();
+if (process.env.NODE_ENV !== 'test') {
+  connectDB();
+}
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -49,6 +51,10 @@ app.use((req, res, next) => {
 // Global Error Middleware
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`🚀 SyncBoard Express Server running on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`🚀 SyncBoard Express Server running on http://localhost:${PORT}`);
+  });
+}
+
+export default app;

@@ -22,6 +22,11 @@ export const createTask = async (req, res, next) => {
       return res.status(400).json({ message: 'title, columnId, and boardId are required' });
     }
 
+    const allowedPriorities = ['low', 'medium', 'high', 'urgent'];
+    if (priority && !allowedPriorities.includes(priority)) {
+      return res.status(400).json({ message: 'Invalid priority level' });
+    }
+
     const newTask = await Task.create({
       title,
       description: description || '',

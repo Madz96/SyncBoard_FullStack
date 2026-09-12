@@ -12,6 +12,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import ToastNotification from './components/ToastNotification';
+import OfflineBanner from './components/OfflineBanner';
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
@@ -25,6 +26,7 @@ export default function App() {
       <AuthProvider>
         <NotificationProvider>
           <TasksProvider>
+            <OfflineBanner />
             <Routes>
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
