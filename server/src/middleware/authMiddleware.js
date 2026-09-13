@@ -6,7 +6,11 @@ export const protect = (req, res, next) => {
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     try {
       token = req.headers.authorization.split(' ')[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'syncboard_super_secret_key_2026');
+      if (!process.env.JWT_SECRET) {
+        return res.status(500).json({ message: 'JWT_SECRET is not configured' });
+      }
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
       req.user = decoded;
       return next();
     } catch (error) {

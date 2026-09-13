@@ -2,9 +2,13 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
 const generateToken = (user) => {
+  if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET is not configured');
+  }
+
   return jwt.sign(
     { id: user.id, email: user.email, name: user.name },
-    process.env.JWT_SECRET || 'syncboard_super_secret_key_2026',
+    process.env.JWT_SECRET,
     { expiresIn: '30d' }
   );
 };
