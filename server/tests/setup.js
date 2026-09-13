@@ -1,6 +1,8 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 
+process.env.JWT_SECRET = 'test-only-secret';
+
 let mongoServer;
 
 export const connect = async () => {
